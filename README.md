@@ -9,7 +9,9 @@ PWA para completar partidos de fútbol amateur. Incluye las 4 funciones del MVP:
 | `index.html`, `app.js` | Interfaz (sin dependencias ni compilación) |
 | `core.js` | Reglas de negocio, las usan el navegador y el servidor |
 | `manifest.webmanifest`, `sw.js`, `icon*` | Instalación como app desde el navegador |
-| `server/server.js` | API y servidor de archivos (solo Node 18 o superior, sin `npm install`) |
+| `lib/api.js` | Rutas de la API (compartidas por Vercel y el servidor local) |
+| `api/index.js`, `lib/store-pg.js`, `vercel.json` | Despliegue en Vercel con Postgres |
+| `server/server.js`, `lib/store-file.js` | Servidor local con archivo JSON (solo Node 18 o superior, sin `npm install`) |
 | `server/test-core.js` | 29 casos de prueba automáticos |
 
 Sin servidor, la interfaz funciona en **modo demostración** (datos solo en el navegador). Con servidor, el aviso desaparece y los datos son compartidos.
@@ -21,7 +23,16 @@ node server/server.js          # abre http://127.0.0.1:3000
 node --test server/test-core.js
 ```
 
-## Desplegar en el VPS (Ubuntu)
+## Desplegar en Vercel
+
+1. Importar el repositorio en Vercel (Framework Preset: **Other**, sin comando de build).
+2. En el proyecto: **Storage → Create Database → Neon (Postgres)** y conectarla. Esto crea la variable `DATABASE_URL` (también sirve `POSTGRES_URL`).
+3. Volver a desplegar (**Deployments → Redeploy**) para que tome la variable.
+4. Verificar: `https://<tu-proyecto>.vercel.app/api/health` debe responder `{"ok":true,"app":"juntix"}`. Si la app muestra el aviso de modo demostración, la base de datos no está conectada.
+
+Las tablas (`juntix_state`, `juntix_hits`) se crean solas en la primera solicitud. Respaldo: desde el panel de Neon, o `pg_dump $DATABASE_URL > respaldo.sql`.
+
+## Desplegar en un VPS (alternativa)
 
 1. Instalar Node 20 o 22 y subir esta carpeta a `/opt/juntix`.
 2. Servicio `systemd` en `/etc/systemd/system/juntix.service`:
@@ -68,7 +79,7 @@ sudo certbot --nginx -d juntix.tudominio.cl
 
 La app debe quedar en la raíz del dominio (no en una subcarpeta).
 
-## Respaldo semanal (Joseth)
+## Respaldo semanal en VPS (Joseth)
 
 Todos los datos están en `/var/lib/juntix/juntix.json`. Un respaldo semanal con cron:
 
@@ -90,5 +101,5 @@ Para restaurar, detén el servicio, copia el respaldo sobre `juntix.json` y vuel
 
 - No hay verificación de correo ni restablecimiento de contraseña (requieren enviar correos).
 - No hay notificaciones push ni recordatorios: la persona ve su lugar y los avisos al abrir la aplicación.
-- La base de datos es un archivo JSON, suficiente para el piloto de 30 usuarios. Para escalar se cambia por MySQL o PostgreSQL sin tocar `core.js`.
+- El estado se guarda como un solo documento (archivo JSON local o una fila JSONB en Postgres), suficiente para el piloto de 30 usuarios. Para escalar se pasa a tablas normalizadas sin tocar `core.js`.
 - Solo fútbol, como define el alcance del piloto.

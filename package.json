@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "description": "MVP de Juntix: PWA para completar partidos de fútbol amateur.",
-  "engines": { "node": ">=18" },
+  "engines": { "node": "22.x" },
   "scripts": {
-    "start": "node server.js",
-    "test": "node --test test-core.js"
+    "start": "node server/server.js",
+    "test": "node --test server/test-core.js"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
   }
 }
