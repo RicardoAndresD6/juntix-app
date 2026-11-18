@@ -32,6 +32,17 @@ node --test server/test-core.js
 
 Las tablas (`juntix_state`, `juntix_hits`) se crean solas en la primera solicitud. Respaldo: desde el panel de Neon, o `pg_dump $DATABASE_URL > respaldo.sql`.
 
+### Cargar datos de demostración
+
+1. Copia `DATABASE_URL` desde Vercel (**Settings → Environment Variables**, botón para mostrar el valor) a un archivo `.env.local` en la raíz:
+   ```
+   DATABASE_URL=postgres://...
+   ```
+2. `npm install` y luego `npm run seed`. Crea 14 cuentas `@demo.juntix.cl` y 6 partidos en los próximos días (uno lleno con lista de espera).
+3. Para recrearlos con fechas nuevas: `npm run seed -- --reset`. Solo borra las cuentas demo y sus partidos.
+
+La contraseña de las cuentas demo está en `scripts/seed.js` (o se define con `SEED_PASSWORD`). `.env.local` no se sube al repositorio.
+
 ## Desplegar en un VPS (alternativa)
 
 1. Instalar Node 20 o 22 y subir esta carpeta a `/opt/juntix`.
