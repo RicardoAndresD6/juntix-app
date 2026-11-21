@@ -12,7 +12,7 @@ PWA para completar partidos de fútbol amateur. Incluye las 4 funciones del MVP:
 | `lib/api.js` | Rutas de la API (compartidas por Vercel y el servidor local) |
 | `api/index.js`, `lib/store-pg.js`, `vercel.json` | Despliegue en Vercel con Postgres |
 | `server/server.js`, `lib/store-file.js` | Servidor local con archivo JSON (solo Node 18 o superior, sin `npm install`) |
-| `server/test-core.js` | 29 casos de prueba automáticos |
+| `server/test-core.js` | 30 casos de prueba automáticos |
 
 Sin servidor, la interfaz funciona en **modo demostración** (datos solo en el navegador). Con servidor, el aviso desaparece y los datos son compartidos.
 

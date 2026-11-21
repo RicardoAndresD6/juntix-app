@@ -209,6 +209,7 @@
       '<a href="#crear" class="fabw"><span class="fab">' + icon('plus', '') + '</span>Crear</a>' +
       '<a href="#perfil" class="' + (active === 'u' ? 'on' : '') + '">' + icon('user') + 'Perfil</a></nav>';
   }
+  function deskNav() { return nav('').replace('class="nav"', 'class="nav desk"'); }
   function dots(v) {
     var out = '';
     for (var i = 0; i < v.capacity; i++) out += '<i class="dot' + (i < v.inCount ? '' : ' off') + '"></i>';
@@ -274,11 +275,12 @@
       '<div class="pad"><h1>Crea tu partido</h1><p class="sub">Lo publicamos para que se sumen jugadores cerca.</p>' +
       field({ id: 'title', label: 'Título', ph: 'Pichanga del jueves', hint: 'Ej.: Fútbol 7 del sábado', max: 60 }) +
       field({ id: 'place', label: 'Lugar', icon: 'map', ph: 'Cancha o recinto', max: 80 }) +
+      field({ id: 'address', label: 'Dirección o referencia (opcional)', icon: 'pin', ph: 'Ej.: Av. Grecia 1234, entrada por calle Roma', hint: 'Para que los demás encuentren la cancha.', max: 120 }) +
       field({ id: 'comuna', label: 'Comuna', icon: 'pin', value: S.user.comuna, list: 'comunas', max: 40 }) + datalist() +
       '<div class="row2">' + field({ id: 'date', label: 'Fecha', type: 'date', icon: 'cal', value: C.addDays(today, 1), min: today }) + field({ id: 'time', label: 'Hora', type: 'time', icon: 'clock', value: '20:00' }) + '</div>' +
       '<div class="field"><span class="lbl" id="l-cap">Cupos</span><div class="stepper" role="group" aria-labelledby="l-cap"><button type="button" data-act="cap" data-d="-1" aria-label="Quitar un cupo">−</button><b id="cap" aria-live="polite">10</b><button type="button" data-act="cap" data-d="1" aria-label="Agregar un cupo">+</button></div>' +
       '<p class="hint">Total de jugadores, contándote a ti.</p><p class="errmsg" id="e-capacity" hidden></p></div><p class="errmsg" id="e-form" hidden></p></div>' +
-      '<div class="foot"><button class="btn" type="submit">Publicar partido</button></div></form>');
+      '<div class="foot"><button class="btn" type="submit">Publicar partido</button></div>' + deskNav() + '</form>');
   }
 
   function matchHTML(v) {
@@ -304,9 +306,10 @@
     }).join('');
     return '<div class="screen"><div class="hero"><div class="bar"><a class="round" href="#partidos" aria-label="Volver">' + icon('back') + '</a><button type="button" class="round" data-act="share" aria-label="Compartir partido">' + icon('share') + '</button></div>' +
       '<div class="tags"><span class="chip tag">' + esc(v.label) + '</span>' + chip(v) + '</div><h1>' + esc(v.title) + '</h1><div class="meta">' + icon('cal') + esc(v.dateLabel) + ' · ' + esc(v.time) + '</div>' +
-      '<div class="meta">' + icon('pin') + esc(v.place) + ' · ' + esc(v.comuna) + '</div></div>' + banner +
+      '<div class="meta">' + icon('pin') + esc(v.place) + ' · ' + esc(v.comuna) + '</div>' +
+      (v.address ? '<div class="meta">' + icon('map') + esc(v.address) + '</div>' : '') + '</div>' + banner +
       '<div class="sect"><div class="hd"><h2>Inscritos</h2><div style="display:flex;gap:10px;align-items:center">' + dots(v) + '<span class="count">' + v.inCount + '/' + v.capacity + '</span></div></div><div class="people">' + people + '</div></div><div class="pad-b"></div>' +
-      '<div class="foot">' + foot + '</div></div>';
+      '<div class="foot">' + foot + '</div>' + deskNav() + '</div>';
   }
   function viewMatch(id, quiet) {
     var rid = S.route;
@@ -431,7 +434,7 @@
       api.register({ name: v('name'), email: v('email'), password: v('password'), comuna: v('comuna'), adult: ch('adult'), consent: ch('consent') }).then(function (u) { S.busy = false; S.user = u; go('partidos'); toast('Cuenta creada', 'Bienvenido a Juntix.'); }, fail);
     } else if (id === 'f-new') {
       S.busy = true; setBusy(f, true, 'Publicando…');
-      api.create({ title: v('title'), place: v('place'), comuna: v('comuna'), date: v('date'), time: v('time'), capacity: Number(document.getElementById('cap').textContent) })
+      api.create({ title: v('title'), place: v('place'), address: v('address'), comuna: v('comuna'), date: v('date'), time: v('time'), capacity: Number(document.getElementById('cap').textContent) })
         .then(function (m) { S.busy = false; go('partido-' + m.id); toast('Partido publicado', 'Ya aparece en el listado.'); }, fail);
     }
   });

@@ -128,7 +128,7 @@
     }).sort(function (a, b) { return (a.role === 'Organizador' ? 0 : 1) - (b.role === 'Organizador' ? 0 : 1); });
     var note = s.notes.find(function (n) { return n.matchId === matchId && n.userId === userId && !n.seen; }) || null;
     return {
-      id: m.id, title: m.title, label: formatLabel(m.capacity), place: m.place, comuna: m.comuna,
+      id: m.id, title: m.title, label: formatLabel(m.capacity), place: m.place, address: m.address || '', comuna: m.comuna,
       date: m.date, time: m.time, dateLabel: formatDate(m.date), capacity: m.capacity,
       organizerId: m.organizerId, organizerName: shortName(userName(s, m.organizerId)),
       inCount: ins.length, free: Math.max(0, m.capacity - ins.length), waitCount: waits.length,
@@ -163,16 +163,18 @@
     now = now || Date.now();
     var title = String(d.title || '').trim().replace(/\s+/g, ' ');
     var place = String(d.place || '').trim().replace(/\s+/g, ' ');
+    var address = String(d.address || '').trim().replace(/\s+/g, ' ');
     var comuna = String(d.comuna || '').trim();
     var cap = Number(d.capacity);
     if (title.length < 3 || title.length > 60) throw err('title', 'Escribe un título de 3 a 60 letras. Ej.: Fútbol 7 del sábado.', 'title');
     if (place.length < 3 || place.length > 80) throw err('place', 'Escribe el lugar donde se juega.', 'place');
+    if (address.length > 120) throw err('address', 'La dirección o referencia puede tener hasta 120 letras.', 'address');
     if (!comuna || comuna.length > 40) throw err('comuna', 'Escribe la comuna.', 'comuna');
     if (!isDate(d.date)) throw err('date', 'Elige la fecha del partido.', 'date');
     if (!isTime(d.time)) throw err('time', 'Elige la hora del partido.', 'time');
     if ((d.date + 'T' + d.time) <= localNow(now)) throw err('date', 'La fecha y la hora deben ser posteriores a este momento.', 'date');
     if (!Number.isInteger(cap) || cap < MIN_CAP || cap > MAX_CAP) throw err('capacity', 'Los cupos deben ser entre ' + MIN_CAP + ' y ' + MAX_CAP + '.', 'capacity');
-    var m = { id: uid(s, 'm'), title: title, place: place, comuna: comuna, date: d.date, time: d.time, capacity: cap, organizerId: userId, createdAt: new Date(now).toISOString() };
+    var m = { id: uid(s, 'm'), title: title, place: place, address: address, comuna: comuna, date: d.date, time: d.time, capacity: cap, organizerId: userId, createdAt: new Date(now).toISOString() };
     s.matches.push(m);
     s.regs.push({ id: uid(s, 'r'), matchId: m.id, userId: userId, status: 'in', seq: ++s.seq });
     return m;

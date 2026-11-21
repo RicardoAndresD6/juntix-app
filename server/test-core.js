@@ -165,3 +165,13 @@ test('L2 el organizador cancela y el partido desaparece', () => {
   assert.throws(() => core.cancelMatch(s, a.id, m.id), { code: 'forbidden' });
   core.cancelMatch(s, o.id, m.id); assert.equal(s.matches.length, 0);
 });
+
+// F2. Dirección o referencia de la cancha (opcional)
+test('F2.5 la dirección o referencia es opcional, se guarda limpia y se muestra en el partido', () => {
+  const { s, mk } = setup(); const o = mk(1);
+  const sin = core.createMatch(s, o.id, { title: 'Partido', place: 'Cancha', comuna: 'Santiago', date: '2026-11-19', time: '20:00', capacity: 10 }, NOW);
+  assert.equal(core.view(s, sin.id, o.id).address, '');
+  const con = core.createMatch(s, o.id, { title: 'Partido', place: 'Cancha', address: '  Av. Grecia   1234,  entrada por Roma ', comuna: 'Santiago', date: '2026-11-19', time: '20:00', capacity: 10 }, NOW);
+  assert.equal(core.view(s, con.id, o.id).address, 'Av. Grecia 1234, entrada por Roma');
+  assert.throws(() => core.createMatch(s, o.id, { title: 'Partido', place: 'Cancha', address: 'x'.repeat(121), comuna: 'Santiago', date: '2026-11-19', time: '20:00', capacity: 10 }, NOW), { code: 'address' });
+});
